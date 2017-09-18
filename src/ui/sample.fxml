@@ -59,7 +59,7 @@
             <Label layoutX="138.0" layoutY="46.0" text="€" />
          </children>
       </Pane>
-       <Button fx:id="closeButton" onAction="#handleCloseButtonAction" text="Reset" GridPane.columnIndex="6" GridPane.rowIndex="12"> </Button>
+       <Button fx:id="closeButton" onAction="#handleResetButtonAction" text="Reset" GridPane.columnIndex="6" GridPane.rowIndex="12"> </Button>
       <Button fx:id="calculateButton" mnemonicParsing="false" onAction="#handleCalculateButtonAction" text="Calculate" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="12" />
    </children>
 </GridPane>

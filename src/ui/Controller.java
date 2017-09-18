@@ -4,12 +4,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import data.Package;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 public class Controller {
-    public int priceDhl[][];
+    public Package priceDhl[];
     public int packageValues[];
     public int casesDhl;
     @FXML
@@ -21,70 +22,78 @@ public class Controller {
     public Button closeButton;
     public Button calculateButton;
     @FXML
-    public void handleCloseButtonAction(ActionEvent e){
-        Platform.exit();
+    public void handleResetButtonAction(ActionEvent e){
+        inputLength.setText("");
+        inputHeight.setText("");
+        inputDepth.setText("");
+        inputWeight.setText("");
+        outputPrice.setText("");
+        //Platform.exit();
     }
 
     public void handleCalculateButtonAction(ActionEvent e){
         loadDhlPrices();
-        int price=0;
-        packageValues=new int[4];
-        int packageLength = Integer.parseInt(inputLength.getText());
-        int packageHeight = Integer.parseInt(inputHeight.getText());
-        int packageDepth = Integer.parseInt(inputDepth.getText());
-        int packageWeight = Integer.parseInt(inputWeight.getText());
+        packageValues = new int[4];
+        try {
+            int packageLength = Integer.parseUnsignedInt(inputLength.getText());
+            int packageHeight = Integer.parseUnsignedInt(inputHeight.getText());
+            int packageDepth = Integer.parseUnsignedInt(inputDepth.getText());
+            int packageWeight = Integer.parseUnsignedInt(inputWeight.getText());
 
-        packageValues[0]=packageLength;
-        packageValues[1]=packageDepth;
-        packageValues[2]=packageHeight;
-        packageValues[3]=0;
-        Arrays.sort(packageValues); // after sorting the biggest values is stored in [3] lenght, [2] depth [1] height,[0} weight
-        packageValues[0]=packageWeight;
+            packageValues[0]=packageLength;
+            packageValues[1]=packageDepth;
+            packageValues[2]=packageHeight;
+            packageValues[3]=0;
+            Arrays.sort(packageValues); // after sorting the biggest values is stored in [3] lenght, [2] depth [1] height,[0} weight
+            packageValues[0]=packageWeight;
+            Package p0 = new Package(packageValues[3], packageValues[2], packageValues[1], packageValues[0]);
 
-        for(int i=0; i<casesDhl; i++){
-            if((packageValues[3]<=priceDhl[i][0]) && (packageValues[2]<=priceDhl[i][1]) && (packageValues[1]<=priceDhl[i][2]) && (packageValues[0]<=priceDhl[i][3])){
-                price=(priceDhl[i][4]);
-                break;
+            for(int i=0; i<casesDhl; i++){
+                if((p0.getLength()<=priceDhl[i].getLength()) && (p0.getDepth()<=priceDhl[i].getDepth()) && (p0.getHeight()<=priceDhl[i].getHeight()) && (p0.getWeight()<=priceDhl[i].getWeight())){
+                    p0.setPrice(priceDhl[i].getPrice());
+                    break;
+                }
             }
+            if(!(p0.getPrice()==0)) {
+                outputPrice.setText(" " + p0.getPrice());
+            }
+            else{
+                outputPrice.setText("Your Package is to large/heavy!");
+            }
+
+        }catch(Exception ex){
+            inputLength.setText("");
+            inputHeight.setText("");
+            inputDepth.setText("");
+            inputWeight.setText("");
+            outputPrice.setText("No valid data");
+
         }
-
-        //System.out.println(packageValues[0]+ " " + packageValues[1] +" "+ packageValues[2]+ " "+packageValues[3]);
-        outputPrice.setText(" "+price);
-
     }
 
     public void loadDhlPrices(){
-        casesDhl=6;
-        priceDhl= new int[casesDhl][5];
-        priceDhl[0][0]=300; //leght
-        priceDhl[0][1]=300; //depth
-        priceDhl[0][2]=150; //height
-        priceDhl[0][3]=1000; //weight
-        priceDhl[0][4]=389; //price
+        casesDhl=5;
+        priceDhl = new Package[casesDhl];
+        //the current package types are stored with the border values
+        Package p1 = new Package(300,300,150,1000);
+        p1.setPrice(389);
+        Package p2 = new Package(600,300,150,2000);
+        p2.setPrice(439);
+        Package p3 = new Package(1200,600,600,5000);
+        p3.setPrice(599);
+        Package p4 = new Package(1200,600,600,10000);
+        p4.setPrice(849);
+        Package p5 = new Package(1200,600,600,31500);
+        p5.setPrice(1649);
 
-        priceDhl[1][0]=600;
-        priceDhl[1][1]=300;
-        priceDhl[1][2]=150;
-        priceDhl[1][3]=2000;
-        priceDhl[1][4]=439;
+        priceDhl[0]=p1;
+        priceDhl[1]=p2;
+        priceDhl[2]=p3;
+        priceDhl[3]=p4;
+        priceDhl[4]=p5;
 
-        priceDhl[2][0]=1200;
-        priceDhl[2][1]=600;
-        priceDhl[2][2]=600;
-        priceDhl[2][3]=5000;
-        priceDhl[2][4]=599;
-
-        priceDhl[3][0]=1200;
-        priceDhl[3][1]=600;
-        priceDhl[3][2]=600;
-        priceDhl[3][3]=10000;
-        priceDhl[3][4]=849;
-
-        priceDhl[4][0]=1200;
-        priceDhl[4][1]=600;
-        priceDhl[4][2]=600;
-        priceDhl[4][3]=31500;
-        priceDhl[4][4]=1649;
 
     }
+
+
 }
