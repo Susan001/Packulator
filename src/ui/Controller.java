@@ -36,6 +36,10 @@ public class Controller implements Initializable {
         inputDepth.setText("");
         inputWeight.setText("");
         outputPrice.setText("");
+        outputDepth.setText("");
+        outputHeight.setText("");
+        outputLength.setText("");
+        resetPackage();
         //Platform.exit();
     }
     public void createPackage(){
@@ -88,7 +92,7 @@ public class Controller implements Initializable {
         loadDhlPrices();
         packageValues = new int[4];
         try {
-            if(myPackage.getLenght()==0) {
+            if(myPackage.getLength()==0) {
                 int packageLength = Integer.parseUnsignedInt(inputLength.getText());
                 int packageHeight = Integer.parseUnsignedInt(inputHeight.getText());
                 int packageDepth = Integer.parseUnsignedInt(inputDepth.getText());
@@ -100,20 +104,24 @@ public class Controller implements Initializable {
                 packageValues[3] = 0;
                 Arrays.sort(packageValues); // after sorting the biggest values is stored in [3] lenght, [2] depth [1] height,[0} weight
                 packageValues[0] = packageWeight;
-                Package p0 = new Package(packageValues[3], packageValues[2], packageValues[1], packageValues[0]);
 
+                myPackage.setLength(myPackage.getLength() + packageValues[3]);
+                myPackage.setDepth(myPackage.getDepth() + packageValues[2]);
+                myPackage.setHeight(myPackage.getHeight() + packageValues[1]);
+                myPackage.setWeight(myPackage.getWeight() + packageValues[0]);
+            }
 
                 for (int i = 0; i < casesDhl; i++) {
-                    if ((p0.getLength() <= priceDhl[i].getLength()) && (p0.getDepth() <= priceDhl[i].getDepth()) && (p0.getHeight() <= priceDhl[i].getHeight()) && (p0.getWeight() <= priceDhl[i].getWeight())) {
-                        p0.setPrice(priceDhl[i].getPrice());
+                    if ((myPackage.getLength() <= priceDhl[i].getLength()) && (myPackage.getDepth() <= priceDhl[i].getDepth()) && (myPackage.getHeight() <= priceDhl[i].getHeight()) && (myPackage.getWeight() <= priceDhl[i].getWeight())) {
+                        myPackage.setPrice(priceDhl[i].getPrice());
                         break;
                     }
                 }
-                if (!(p0.getPrice() == 0)) {
-                    outputPrice.setText(" " + p0.getPrice());
+                if (!(myPackage.getPrice() == 0)) {
+                    outputPrice.setText(" " + myPackage.getPrice());
                 } else {
                     outputPrice.setText("Your Package is to large/heavy!");
-                }
+
             }
 
         }catch(Exception ex){
