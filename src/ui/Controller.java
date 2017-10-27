@@ -11,10 +11,7 @@ import javafx.scene.control.TextField;
 import data.Packet;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Main Controller class
@@ -25,6 +22,7 @@ public class Controller implements Initializable, ShippingCostCalculatable {
     public int PacketValues[];
     public Packet myPacket;
     public int casesDhl;
+    public List<Packet> packages;
     @FXML
     public TextField inputHeight;
     public TextField inputDepth;
@@ -49,7 +47,7 @@ public class Controller implements Initializable, ShippingCostCalculatable {
         resetPacket();
         //Platform.exit();
     }
-    public void createPacket(){
+    public void createMyPacket(){
         myPacket=new Packet(0,0,0,0);
     }
     public void resetPacket(){
@@ -64,24 +62,14 @@ public class Controller implements Initializable, ShippingCostCalculatable {
         loadDhlPrices();
         PacketValues = new int[4];
         try{
-            int PacketLength = Integer.parseUnsignedInt(inputLength.getText());
-            int PacketHeight = Integer.parseUnsignedInt(inputHeight.getText());
-            int PacketDepth = Integer.parseUnsignedInt(inputDepth.getText());
-            int PacketWeight = Integer.parseUnsignedInt(inputWeight.getText());
-
-            PacketValues[0]=PacketLength;
-            PacketValues[1]=PacketDepth;
-            PacketValues[2]=PacketHeight;
-            PacketValues[3]=0;
-            Arrays.sort(PacketValues); // after sorting the biggest values is stored in [3] lenght, [2] depth [1] height,[0} weight
-            PacketValues[0]=PacketWeight;
-            myPacket.setLength(myPacket.getLength()+PacketValues[3]);
-            myPacket.setDepth(myPacket.getDepth()+PacketValues[2]);
-            myPacket.setHeight(myPacket.getHeight()+PacketValues[1]);
-            myPacket.setWeight(myPacket.getWeight()+PacketValues[0]);
-            outputDepth.setText(""+myPacket.getDepth());
-            outputHeight.setText(""+myPacket.getHeight());
+            Packet helpPacket;
+            helpPacket = createPacket();
+            packages.add(helpPacket);
+            loadMyPackage(packages);
             outputLength.setText(""+myPacket.getLength());
+            outputHeight.setText(""+myPacket.getHeight());
+            outputDepth.setText(""+myPacket.getDepth());
+
 
         }
         catch(Exception ex){
@@ -89,54 +77,73 @@ public class Controller implements Initializable, ShippingCostCalculatable {
             inputHeight.setText("");
             inputDepth.setText("");
             inputWeight.setText("");
-            outputPrice.setText("No valid data");
+            outputPrice.setText("No valid data3");
 
         }
 
 
     }
+
+    public Packet createPacket(){
+        try {
+            Packet helpPacket = new Packet(0, 0, 0, 0);
+            int PacketLength = Integer.parseUnsignedInt(inputLength.getText());
+            int PacketHeight = Integer.parseUnsignedInt(inputHeight.getText());
+            int PacketDepth = Integer.parseUnsignedInt(inputDepth.getText());
+            int PacketWeight = Integer.parseUnsignedInt(inputWeight.getText());
+
+            PacketValues[0] = PacketLength;
+            PacketValues[1] = PacketDepth;
+            PacketValues[2] = PacketHeight;
+            PacketValues[3] = 0;
+            Arrays.sort(PacketValues); // after sorting the biggest values is stored in [3] lenght, [2] depth [1] height,[0} weight
+            PacketValues[0] = PacketWeight;
+            helpPacket.setLength(PacketValues[3]);
+            helpPacket.setDepth(PacketValues[2]);
+            helpPacket.setHeight(PacketValues[1]);
+            helpPacket.setWeight(PacketValues[0]);
+
+            return helpPacket;
+        }
+        catch(Exception ex){
+            inputLength.setText("");
+            inputHeight.setText("");
+            inputDepth.setText("");
+            inputWeight.setText("");
+            outputPrice.setText("No valid data1");
+            return null;
+        }
+    }
+
     public void handleCalculateButtonAction(ActionEvent e){
         loadDhlPrices();
         PacketValues = new int[4];
         try {
-            if(myPacket.getLength()==0) {
-                int PacketLength = Integer.parseUnsignedInt(inputLength.getText());
-                int PacketHeight = Integer.parseUnsignedInt(inputHeight.getText());
-                int PacketDepth = Integer.parseUnsignedInt(inputDepth.getText());
-                int PacketWeight = Integer.parseUnsignedInt(inputWeight.getText());
-
-                PacketValues[0] = PacketLength;
-                PacketValues[1] = PacketDepth;
-                PacketValues[2] = PacketHeight;
-                PacketValues[3] = 0;
-                Arrays.sort(PacketValues); // after sorting the biggest values is stored in [3] lenght, [2] depth [1] height,[0} weight
-                PacketValues[0] = PacketWeight;
-
-                myPacket.setLength(myPacket.getLength() + PacketValues[3]);
-                myPacket.setDepth(myPacket.getDepth() + PacketValues[2]);
-                myPacket.setHeight(myPacket.getHeight() + PacketValues[1]);
-                myPacket.setWeight(myPacket.getWeight() + PacketValues[0]);
-            }
-
-                for (int i = 0; i < casesDhl; i++) {
-                    if ((myPacket.getLength() <= priceDhl[i].getLength()) && (myPacket.getDepth() <= priceDhl[i].getDepth()) && (myPacket.getHeight() <= priceDhl[i].getHeight()) && (myPacket.getWeight() <= priceDhl[i].getWeight())) {
-                        myPacket.setPrice(priceDhl[i].getPrice());
-                        break;
-                    }
+            if(packages.size() ==0) {
+                Packet helpPacket;
+                helpPacket = createPacket();
+                if(helpPacket !=null){
+                    packages.add(helpPacket);
                 }
-                if (!(myPacket.getPrice() == 0)) {
-                    outputPrice.setText(" " + myPacket.getPrice());
-                } else {
-                    outputPrice.setText("Your Packet is to large/heavy!");
-
             }
+            double result;
+            result = calcShippingCosts(packages);
+            if(result==Double.NaN)
+            {
+                outputPrice.setText("To heavy!");
+            }
+            else{
+                outputPrice.setText(""+result);
+            }
+
+
 
         }catch(Exception ex){
             inputLength.setText("");
             inputHeight.setText("");
             inputDepth.setText("");
             inputWeight.setText("");
-            outputPrice.setText("No valid data");
+            outputPrice.setText("No valid data2");
 
         }
     }
@@ -166,14 +173,46 @@ public class Controller implements Initializable, ShippingCostCalculatable {
     }
 
     @Override
-    public double calcShippingCost(List<Packet> packets){
-        
+    public double calcShippingCosts(List<Packet> packets){
+        loadMyPackage(packets);
+
+
+
+        for (int i = 0; i < casesDhl; i++) {
+            if ((myPacket.getLength() <= priceDhl[i].getLength()) && (myPacket.getDepth() <= priceDhl[i].getDepth()) && (myPacket.getHeight() <= priceDhl[i].getHeight()) && (myPacket.getWeight() <= priceDhl[i].getWeight())) {
+                myPacket.setPrice(priceDhl[i].getPrice());
+                break;
+            }
+        }
+        if (!(myPacket.getPrice() == 0)) {
+            return myPacket.getPrice();
+        } else {
+            return Double.NaN;
+
+        }
+
+
+    }
+
+    public void loadMyPackage(List<Packet> packets){
+
+        for(int a=0; a<packets.size(); a++){
+            if(myPacket.getDepth()< ( packets.get(a)).getDepth() ){
+                myPacket.setDepth(packets.get(a).getDepth());
+            }
+            if(myPacket.getLength() < packets.get(a).getLength()){
+                myPacket.setLength(packets.get(a).getLength());
+            }
+            myPacket.setWeight(myPacket.getWeight()+packets.get(a).getWeight());
+            myPacket.setHeight(myPacket.getHeight()+packets.get(a).getHeight());
+        }
 
     }
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        createPacket();
+        createMyPacket();
+        packages= new ArrayList<>();
     }
 }
