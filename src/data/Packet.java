@@ -3,14 +3,14 @@ package data;
 /**
  * Created by khaze on 18.09.2017.
  */
-public class Package {
+public class Packet {
     private int height;
     private int weight;
     private int depth;
     private int length;
     private int price;
 
-    public Package( int pLength, int pDepth, int pHeight, int pWeight){
+    public Packet( int pLength, int pDepth, int pHeight, int pWeight){
         height=pHeight;
         weight=pWeight;
         depth=pDepth;
@@ -25,12 +25,24 @@ public class Package {
     public int getHeight(){
         return height;
     }
+    /**Return length
+     *
+     * @retun Packet length in mm
+     */
     public int getDepth(){
         return depth;
     }
+    /**Return length
+     *
+     * @retun Packet length in mm
+     */
     public int getLength(){
         return length;
     }
+    /**Return weight
+     *
+     * @retun Packet weight in gramm
+     */
     public int getWeight(){
         return weight;
     }
@@ -46,6 +58,11 @@ public class Package {
     public void setWeight(int weight) {
         this.weight = weight;
     }
+
+    /**Set length
+     *
+     * @param length
+     */
 
     public void setLength(int length) {
         this.length = length;
